@@ -39,38 +39,22 @@ export default function Message({ message, personName, conversationId }: Message
 					
 					// Fetch the message with audio URL from the database
 					const response = await fetch(`/api/message/${message.id}`);
-					console.log('Fetching audio for message:', message.id, 'Response status:', response.status, 'Retry:', retryCount);
 					
 					if (response.ok) {
 						const data = await response.json();
-						console.log('Message data received:', data);
 						
 						if (data.audio_url) {
-							console.log('Setting audio URL:', data.audio_url);
 							setAudioUrl(data.audio_url);
-							
-							// Test if the audio URL is accessible
-							fetch(data.audio_url, { method: 'HEAD' })
-								.then(response => {
-									console.log('Audio file accessibility check:', {
-										status: response.status,
-										contentType: response.headers.get('content-type'),
-										contentLength: response.headers.get('content-length')
-									});
-								})
-								.catch(error => console.error('Audio accessibility check failed:', error));
 							
 							// Auto-play the audio when it's loaded
 							setTimeout(() => {
 								if (audioRef.current) {
-									console.log('Attempting to auto-play audio');
 									audioRef.current.play().catch(error => {
 										console.error('Auto-play failed:', error);
 									});
 								}
 							}, 100);
 						} else {
-							console.log('No audio URL found in message data');
 							// Retry if no audio URL yet and haven't exceeded max retries
 							if (retryCount < maxRetries) {
 								retryCount++;
@@ -79,7 +63,6 @@ export default function Message({ message, personName, conversationId }: Message
 							}
 						}
 					} else {
-						console.log('Message not found yet, will retry...', retryCount + 1, 'of', maxRetries);
 						// Retry if message not found and haven't exceeded max retries
 						if (retryCount < maxRetries) {
 							retryCount++;
