@@ -71,7 +71,7 @@ export default function Testimonials() {
                 
                 {/* Testimonial Text */}
                 <p className="text-card-foreground leading-relaxed mb-6">
-                  "{testimonial.quote}"
+                  &ldquo;{testimonial.quote}&rdquo;
                 </p>
 
                 {/* Voice Preview */}

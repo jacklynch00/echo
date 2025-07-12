@@ -61,7 +61,7 @@ export default function FAQ() {
       <div className="container mx-auto px-6 relative">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            What's possible with{" "}
+            What&apos;s possible with{" "}
             <span className="text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-clip-text">
               Echo
             </span>
@@ -95,7 +95,7 @@ export default function FAQ() {
           <div className="inline-flex flex-col sm:flex-row items-center gap-4 bg-card/90 backdrop-blur-md border border-border rounded-xl px-8 py-6">
             <div className="text-center sm:text-left">
               <h3 className="font-semibold text-card-foreground mb-1">Still have questions?</h3>
-              <p className="text-muted-foreground text-sm">We're here to help you preserve precious memories</p>
+              <p className="text-muted-foreground text-sm">We&apos;re here to help you preserve precious memories</p>
             </div>
             <div className="flex gap-3">
               <Link href="/help" className="px-4 py-2 text-primary hover:text-primary/80 transition-colors font-medium">

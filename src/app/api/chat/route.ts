@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai'
-import { streamText, appendResponseMessages, generateId } from 'ai'
+import { streamText } from 'ai'
 import { createServerActionClient } from '@/src/lib/supabase-server'
 import { getUser } from '@/src/lib/auth'
 import { canSendMessage } from '@/src/lib/rateLimit'
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     const systemPrompt = createSystemPrompt(person.name, person.relationship)
     const aiMessages = [
       { role: 'system' as const, content: systemPrompt },
-      ...messages.map((msg: any) => ({
+      ...messages.map((msg: { role: string; content: string }) => ({
         role: msg.role,
         content: msg.content,
       })),

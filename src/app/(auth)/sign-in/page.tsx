@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card'
@@ -16,7 +16,7 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-  const router = useRouter()
+  // const router = useRouter()
 
   const handleGoogleSignIn = async () => {
     try {
@@ -157,7 +157,7 @@ export default function SignInPage() {
 
             {/* Sign Up Link */}
             <div className="text-center text-sm">
-              <span className="text-muted-foreground">Don't have an account? </span>
+              <span className="text-muted-foreground">Don&apos;t have an account? </span>
               <Link href="/sign-up" className="text-primary hover:underline font-medium">
                 Sign up
               </Link>

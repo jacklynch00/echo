@@ -1,6 +1,7 @@
 import { getUser } from '@/src/lib/auth'
 import { redirect } from 'next/navigation'
-import Sidebar from '@/components/Sidebar'
+import { AppSidebar } from '@/components/app-sidebar'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 export default async function DashboardLayout({
   children,
@@ -14,11 +15,11 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <main className="flex-1 overflow-hidden">
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
         {children}
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

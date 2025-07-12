@@ -1,13 +1,12 @@
 import { createServerComponentClient } from '@/src/lib/supabase-server'
 import { getUser } from '@/src/lib/auth'
-import { notFound } from 'next/navigation'
-import ChatWindow from './components/ChatWindow'
+import { notFound, redirect } from 'next/navigation'
 
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
-export default async function PersonChatPage({ params }: PageProps) {
+export default async function PersonPage({ params }: PageProps) {
   const { id } = await params
   const user = await getUser()
   
@@ -29,14 +28,17 @@ export default async function PersonChatPage({ params }: PageProps) {
     notFound()
   }
 
-  // Get or create conversation
+  // Get the most recent conversation or create one if none exists
   let { data: conversation } = await supabase
     .from('conversations')
     .select('*')
     .eq('person_id', person.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .single()
 
   if (!conversation) {
+    // Create a default conversation
     const { data: newConversation } = await supabase
       .from('conversations')
       .insert({
@@ -49,38 +51,6 @@ export default async function PersonChatPage({ params }: PageProps) {
     conversation = newConversation
   }
 
-  // Get existing messages in AI SDK format
-  const { data: messages } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('conversation_id', conversation.id)
-    .order('created_at', { ascending: true })
-
-  // Transform messages to AI SDK format
-  const formattedMessages = messages?.map(msg => ({
-    id: msg.id,
-    role: msg.role as 'user' | 'assistant',
-    content: msg.content,
-    audio_url: msg.audio_url,
-    created_at: msg.created_at,
-  })) || []
-
-  return (
-    <div className="h-full flex flex-col">
-      <div className="border-b border-gray-200 px-6 py-4">
-        <h1 className="text-xl font-semibold">
-          Chat with {person.name}
-        </h1>
-        <p className="text-sm text-gray-500 capitalize">
-          {person.relationship}
-        </p>
-      </div>
-      
-      <ChatWindow
-        person={person}
-        conversation={conversation}
-        initialMessages={formattedMessages}
-      />
-    </div>
-  )
+  // Redirect to the conversation page
+  redirect(`/dashboard/person/${id}/conversation/${conversation.id}`)
 }

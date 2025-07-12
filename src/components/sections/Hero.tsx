@@ -77,7 +77,7 @@ export default function Hero() {
                     <div className="flex-1">
                       <p className="text-sm font-medium text-card-foreground mb-1">Dad</p>
                       <p className="text-sm text-muted-foreground">
-                        "I'm so proud of everything you've accomplished. Remember, I'm always with you in spirit."
+                        &ldquo;I&apos;m so proud of everything you&apos;ve accomplished. Remember, I&apos;m always with you in spirit.&rdquo;
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center cursor-pointer hover:bg-primary/30 transition-colors">

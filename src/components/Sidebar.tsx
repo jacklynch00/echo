@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Avatar, AvatarFallback } from '@/src/components/ui/avatar'
@@ -22,11 +22,7 @@ export default function Sidebar() {
   const pathname = usePathname()
   const supabase = createClientComponentClient()
 
-  useEffect(() => {
-    fetchPersons()
-  }, [])
-
-  async function fetchPersons() {
+  const fetchPersons = useCallback(async () => {
     const { data } = await supabase
       .from('persons')
       .select('*')
@@ -35,7 +31,11 @@ export default function Sidebar() {
     if (data) {
       setPersons(data)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    fetchPersons()
+  }, [fetchPersons])
 
   const handlePersonAdded = () => {
     fetchPersons()
@@ -82,7 +82,7 @@ export default function Sidebar() {
           {persons.length === 0 && (
             <div className="p-4 text-center text-gray-500">
               <p>No persons added yet.</p>
-              <p className="text-sm mt-1">Click "Add Person" to get started.</p>
+              <p className="text-sm mt-1">Click &ldquo;Add Person&rdquo; to get started.</p>
             </div>
           )}
         </div>
