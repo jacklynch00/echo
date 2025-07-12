@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@elevenlabs/elevenlabs-js": "^2.6.0",
+    "@flowglad/nextjs": "^0.10.17",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-select": "^2.2.5",
