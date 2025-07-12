@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerActionClient } from '@/lib/supabase-server'
-import { getUser } from '@/lib/auth'
-import { cloneVoice } from '@/lib/tts'
+import { createServerActionClient } from '@/src/lib/supabase-server'
+import { getUser } from '@/src/lib/auth'
+import { cloneVoice } from '@/src/lib/tts'
 
 export async function POST(request: NextRequest) {
   try {

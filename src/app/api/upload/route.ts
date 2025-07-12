@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerActionClient } from '@/lib/supabase-server'
-import { getUser } from '@/lib/auth'
+import { createServerActionClient } from '@/src/lib/supabase-server'
+import { getUser } from '@/src/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {

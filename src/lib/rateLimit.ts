@@ -3,26 +3,21 @@ import { createServerActionClient } from './supabase-server'
 export async function canSendMessage(userId: string): Promise<boolean> {
   const supabase = await createServerActionClient()
   
-  // Count user messages sent today
+  // Count user messages sent today using join
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   
   const { count, error } = await supabase
     .from('messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('sender', 'user')
+    .select(`
+      *,
+      conversation:conversations!inner(
+        person:persons!inner(user_id)
+      )
+    `, { count: 'exact', head: true })
+    .eq('role', 'user')
+    .eq('conversation.person.user_id', userId)
     .gte('created_at', today.toISOString())
-    .in('conversation_id', 
-      supabase
-        .from('conversations')
-        .select('id')
-        .in('person_id',
-          supabase
-            .from('persons')
-            .select('id')
-            .eq('user_id', userId)
-        )
-    )
 
   if (error) {
     console.error('Error checking message count:', error)
@@ -41,20 +36,15 @@ export async function getRemainingMessages(userId: string): Promise<number> {
   
   const { count, error } = await supabase
     .from('messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('sender', 'user')
+    .select(`
+      *,
+      conversation:conversations!inner(
+        person:persons!inner(user_id)
+      )
+    `, { count: 'exact', head: true })
+    .eq('role', 'user')
+    .eq('conversation.person.user_id', userId)
     .gte('created_at', today.toISOString())
-    .in('conversation_id', 
-      supabase
-        .from('conversations')
-        .select('id')
-        .in('person_id',
-          supabase
-            .from('persons')
-            .select('id')
-            .eq('user_id', userId)
-        )
-    )
 
   if (error) {
     console.error('Error checking message count:', error)
