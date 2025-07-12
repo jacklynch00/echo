@@ -5,7 +5,7 @@ import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card';
 import { MessageCircle, Heart, Users } from 'lucide-react';
-import { signInWithGoogle, sendMagicLink } from '@/lib/auth-client';
+import { signInWithGoogle, sendMagicLink } from '@/src/lib/auth-client';
 
 export default function Home() {
 	const [email, setEmail] = useState('');

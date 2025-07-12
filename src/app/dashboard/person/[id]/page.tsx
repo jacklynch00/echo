@@ -1,5 +1,5 @@
-import { createServerComponentClient } from '@/lib/supabase-server'
-import { getUser } from '@/lib/auth'
+import { createServerComponentClient } from '@/src/lib/supabase-server'
+import { getUser } from '@/src/lib/auth'
 import { notFound } from 'next/navigation'
 import ChatWindow from './components/ChatWindow'
 
@@ -49,12 +49,21 @@ export default async function PersonChatPage({ params }: PageProps) {
     conversation = newConversation
   }
 
-  // Get existing messages
+  // Get existing messages in AI SDK format
   const { data: messages } = await supabase
     .from('messages')
     .select('*')
     .eq('conversation_id', conversation.id)
     .order('created_at', { ascending: true })
+
+  // Transform messages to AI SDK format
+  const formattedMessages = messages?.map(msg => ({
+    id: msg.id,
+    role: msg.role as 'user' | 'assistant',
+    content: msg.content,
+    audio_url: msg.audio_url,
+    created_at: msg.created_at,
+  })) || []
 
   return (
     <div className="h-full flex flex-col">
@@ -70,7 +79,7 @@ export default async function PersonChatPage({ params }: PageProps) {
       <ChatWindow
         person={person}
         conversation={conversation}
-        initialMessages={messages || []}
+        initialMessages={formattedMessages}
       />
     </div>
   )

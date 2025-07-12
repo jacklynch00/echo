@@ -1,5 +1,5 @@
-import { createServerComponentClient } from '@/lib/supabase-server'
-import { getUser } from '@/lib/auth'
+import { createServerComponentClient } from '@/src/lib/supabase-server'
+import { getUser } from '@/src/lib/auth'
 import PersonList from '@/components/PersonList'
 import EmptyState from '@/components/EmptyState'
 

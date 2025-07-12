@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Avatar, AvatarFallback } from '@/src/components/ui/avatar'
 import { Button } from '@/src/components/ui/button'
 import { Plus, MessageCircle } from 'lucide-react'
-import { createClientComponentClient } from '@/lib/supabase'
+import { createClientComponentClient } from '@/src/lib/supabase'
 import AddPersonModal from './AddPersonModal'
 
 interface Person {

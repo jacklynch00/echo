@@ -1,4 +1,4 @@
-import { getUser } from '@/lib/auth'
+import { getUser } from '@/src/lib/auth'
 import { redirect } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 
