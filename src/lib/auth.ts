@@ -3,13 +3,25 @@
 import { redirect } from 'next/navigation';
 import { createServerActionClient } from './supabase-server';
 
+function getRedirectUrl(): string {
+	// For Vercel deployments, use the proper URL construction
+	if (process.env.VERCEL_URL) {
+		return `https://${process.env.VERCEL_URL}`;
+	}
+
+	// For production, use the production URL if available
+	if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+		return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+	}
+
+	// Fallback to the site URL or localhost
+	return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3003';
+}
+
 export async function signInWithGoogle() {
 	const supabase = await createServerActionClient();
 
-	// Get the current origin from headers or fallback to env variable
-	const origin = process.env.VERCEL_URL 
-		? `https://${process.env.VERCEL_URL}` 
-		: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3003';
+	const origin = getRedirectUrl();
 
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider: 'google',
@@ -30,10 +42,7 @@ export async function signInWithGoogle() {
 export async function sendMagicLink(email: string) {
 	const supabase = await createServerActionClient();
 
-	// Get the current origin from headers or fallback to env variable
-	const origin = process.env.VERCEL_URL 
-		? `https://${process.env.VERCEL_URL}` 
-		: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3003';
+	const origin = getRedirectUrl();
 
 	const { error } = await supabase.auth.signInWithOtp({
 		email,
