@@ -60,7 +60,12 @@ export default function ChatWindow({ person, conversation, initialMessages }: Ch
 				{initialMessages.map((message) => (
 					<Message 
 						key={message.id} 
-						message={message} 
+						message={{
+							id: message.id,
+							role: message.role,
+							content: message.content,
+							audio_url: message.audio_url
+						}} 
 						personName={person.name} 
 						conversationId={conversation.id}
 						isNewMessage={false}

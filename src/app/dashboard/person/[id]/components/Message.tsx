@@ -11,6 +11,7 @@ interface MessageProps {
 		id: string;
 		role: 'user' | 'assistant';
 		content: string;
+		audio_url?: string;
 	};
 	personName: string;
 	conversationId: string;
@@ -27,70 +28,79 @@ export default function Message({ message, personName, isNewMessage = false }: M
 	// Fetch audio URL for assistant messages
 	useEffect(() => {
 		if (!isUser && message.id) {
-			let retryCount = 0;
-			const maxRetries = 5;
+			// If this is an existing message with audio URL already provided, use it directly
+			if (message.audio_url) {
+				setAudioUrl(message.audio_url);
+				return;
+			}
 
-			async function fetchAudioUrl() {
-				try {
-					setIsLoading(true);
+			// Only fetch audio for new messages or messages without audio URLs
+			if (isNewMessage) {
+				let retryCount = 0;
+				const maxRetries = 5;
 
-					// Initial wait time increases with retry count
-					const waitTime = Math.min(3000 + retryCount * 2000, 10000);
-					await new Promise((resolve) => setTimeout(resolve, waitTime));
+				async function fetchAudioUrl() {
+					try {
+						setIsLoading(true);
 
-					// Fetch the message with audio URL from the database
-					const response = await fetch(`/api/message/${message.id}`);
+						// Initial wait time increases with retry count
+						const waitTime = Math.min(3000 + retryCount * 2000, 10000);
+						await new Promise((resolve) => setTimeout(resolve, waitTime));
 
-					if (response.ok) {
-						const data = await response.json();
+						// Fetch the message with audio URL from the database
+						const response = await fetch(`/api/message/${message.id}`);
 
-						if (data.audio_url) {
-							setAudioUrl(data.audio_url);
+						if (response.ok) {
+							const data = await response.json();
 
-							// Only auto-play for new messages to avoid browser autoplay restrictions
-							if (isNewMessage) {
-								setTimeout(() => {
-									if (audioRef.current) {
-										audioRef.current.play().catch((error) => {
-											console.error('Auto-play failed:', error);
-										});
-									}
-								}, 100);
+							if (data.audio_url) {
+								setAudioUrl(data.audio_url);
+
+								// Only auto-play for new messages to avoid browser autoplay restrictions
+								if (isNewMessage) {
+									setTimeout(() => {
+										if (audioRef.current) {
+											audioRef.current.play().catch((error) => {
+												console.error('Auto-play failed:', error);
+											});
+										}
+									}, 100);
+								}
+							} else {
+								// Retry if no audio URL yet and haven't exceeded max retries
+								if (retryCount < maxRetries) {
+									retryCount++;
+									setTimeout(fetchAudioUrl, 2000);
+									return; // Don't set loading to false yet
+								}
 							}
 						} else {
-							// Retry if no audio URL yet and haven't exceeded max retries
+							// Retry if message not found and haven't exceeded max retries
 							if (retryCount < maxRetries) {
 								retryCount++;
 								setTimeout(fetchAudioUrl, 2000);
 								return; // Don't set loading to false yet
 							}
 						}
-					} else {
-						// Retry if message not found and haven't exceeded max retries
+					} catch (error) {
+						console.error('Error fetching audio:', error);
+						// Retry on error if haven't exceeded max retries
 						if (retryCount < maxRetries) {
 							retryCount++;
 							setTimeout(fetchAudioUrl, 2000);
 							return; // Don't set loading to false yet
 						}
-					}
-				} catch (error) {
-					console.error('Error fetching audio:', error);
-					// Retry on error if haven't exceeded max retries
-					if (retryCount < maxRetries) {
-						retryCount++;
-						setTimeout(fetchAudioUrl, 2000);
-						return; // Don't set loading to false yet
-					}
-				} finally {
-					// Only set loading to false if we're not retrying
-					if (retryCount >= maxRetries || audioUrl) {
-						setIsLoading(false);
+					} finally {
+						// Only set loading to false if we're not retrying
+						if (retryCount >= maxRetries || audioUrl) {
+							setIsLoading(false);
+						}
 					}
 				}
+				fetchAudioUrl();
 			}
-			fetchAudioUrl();
 		}
-	}, [message.id, isUser, isNewMessage, audioUrl]);
+	}, [message.id, isUser, isNewMessage, message.audio_url, audioUrl]);
 
 	const handlePlayPause = () => {
 		if (!audioRef.current || !audioUrl) return;
