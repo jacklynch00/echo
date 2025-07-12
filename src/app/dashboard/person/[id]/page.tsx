@@ -1,7 +1,7 @@
 import { createServerComponentClient } from '@/src/lib/supabase-server'
 import { getUser } from '@/src/lib/auth'
 import { notFound } from 'next/navigation'
-import ChatWindow from './components/ChatWindow'
+import TelegramChatInstructions from './components/TelegramChatInstructions'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -76,10 +76,9 @@ export default async function PersonChatPage({ params }: PageProps) {
         </p>
       </div>
       
-      <ChatWindow
+      <TelegramChatInstructions
         person={person}
-        conversation={conversation}
-        initialMessages={formattedMessages}
+        userId={user.id}
       />
     </div>
   )
