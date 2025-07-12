@@ -25,7 +25,11 @@ export async function POST(request: NextRequest) {
     // Verify the Telegram user exists and get their Supabase user ID
     const telegramUser = await telegramBot.findOrCreateTelegramUser({
       id: telegram_id,
-      is_bot: false
+      is_bot: false,
+      first_name: '',
+      username: undefined,
+      last_name: undefined,
+      language_code: undefined
     })
 
     if (!telegramUser) {
