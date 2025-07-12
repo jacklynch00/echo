@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-	title: 'Voice Notes for the Dead',
+	title: 'Echo',
 	description: 'Create AI-powered conversations with loved ones who have passed away. Preserve their voice and continue meaningful conversations.',
 };
 
