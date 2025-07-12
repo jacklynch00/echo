@@ -58,7 +58,13 @@ export default function ChatWindow({ person, conversation, initialMessages }: Ch
 			{/* Messages */}
 			<div className='flex-1 overflow-y-auto p-6 space-y-4'>
 				{initialMessages.map((message) => (
-					<Message key={message.id} message={message} personName={person.name} conversationId={conversation.id} />
+					<Message 
+						key={message.id} 
+						message={message} 
+						personName={person.name} 
+						conversationId={conversation.id}
+						isNewMessage={false}
+					/>
 				))}
 
 				{/* Show streaming messages */}
@@ -71,6 +77,7 @@ export default function ChatWindow({ person, conversation, initialMessages }: Ch
 							message={message as { id: string; role: 'user' | 'assistant'; content: string }}
 							personName={person.name}
 							conversationId={conversation.id}
+							isNewMessage={true}
 						/>
 					))}
 

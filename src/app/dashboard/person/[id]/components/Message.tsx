@@ -14,9 +14,10 @@ interface MessageProps {
 	};
 	personName: string;
 	conversationId: string;
+	isNewMessage?: boolean;
 }
 
-export default function Message({ message, personName, conversationId }: MessageProps) {
+export default function Message({ message, personName, isNewMessage = false }: MessageProps) {
 	const isUser = message.role === 'user';
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -28,32 +29,34 @@ export default function Message({ message, personName, conversationId }: Message
 		if (!isUser && message.id) {
 			let retryCount = 0;
 			const maxRetries = 5;
-			
+
 			async function fetchAudioUrl() {
 				try {
 					setIsLoading(true);
-					
+
 					// Initial wait time increases with retry count
-					const waitTime = Math.min(3000 + (retryCount * 2000), 10000);
-					await new Promise(resolve => setTimeout(resolve, waitTime));
-					
+					const waitTime = Math.min(3000 + retryCount * 2000, 10000);
+					await new Promise((resolve) => setTimeout(resolve, waitTime));
+
 					// Fetch the message with audio URL from the database
 					const response = await fetch(`/api/message/${message.id}`);
-					
+
 					if (response.ok) {
 						const data = await response.json();
-						
+
 						if (data.audio_url) {
 							setAudioUrl(data.audio_url);
-							
-							// Auto-play the audio when it's loaded
-							setTimeout(() => {
-								if (audioRef.current) {
-									audioRef.current.play().catch(error => {
-										console.error('Auto-play failed:', error);
-									});
-								}
-							}, 100);
+
+							// Only auto-play for new messages to avoid browser autoplay restrictions
+							if (isNewMessage) {
+								setTimeout(() => {
+									if (audioRef.current) {
+										audioRef.current.play().catch((error) => {
+											console.error('Auto-play failed:', error);
+										});
+									}
+								}, 100);
+							}
 						} else {
 							// Retry if no audio URL yet and haven't exceeded max retries
 							if (retryCount < maxRetries) {
@@ -87,7 +90,7 @@ export default function Message({ message, personName, conversationId }: Message
 			}
 			fetchAudioUrl();
 		}
-	}, [message.id, isUser]);
+	}, [message.id, isUser, isNewMessage, audioUrl]);
 
 	const handlePlayPause = () => {
 		if (!audioRef.current || !audioUrl) return;
