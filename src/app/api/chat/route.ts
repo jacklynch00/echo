@@ -1,6 +1,7 @@
 import { openai } from '@ai-sdk/openai'
 import { streamText } from 'ai'
 import { createServerActionClient } from '@/src/lib/supabase-server'
+import { createServiceRoleClient } from '@/src/lib/supabase-service'
 import { getUser } from '@/src/lib/auth'
 import { canSendMessage } from '@/src/lib/rateLimit'
 import { createSystemPrompt } from '@/src/lib/ai'
@@ -81,8 +82,11 @@ export async function POST(request: Request) {
               // Upload audio to Supabase storage using user ID for RLS policies
               const audioFileName = `${user.id}/${Date.now()}.mp3`
               
-              const { data: audioUpload, error: audioError } = await supabase.storage
-                .from('generated-audio')
+              // Use service role client to bypass RLS for storage
+              const serviceSupabase = createServiceRoleClient()
+              
+              const { data: audioUpload, error: audioError } = await serviceSupabase.storage
+                .from('uploads')
                 .upload(audioFileName, audioBuffer, {
                   contentType: 'audio/mpeg',
                   cacheControl: '3600',
@@ -91,22 +95,14 @@ export async function POST(request: Request) {
 
               if (audioError) {
                 console.error('Audio upload error:', audioError)
+                audioUrl = null
               } else {
-                // Use signed URL instead of public URL for better security and reliability
-                const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-                  .from('generated-audio')
-                  .createSignedUrl(audioUpload.path, 3600) // 1 hour expiry
-                
-                if (signedUrlError) {
-                  console.error('Signed URL creation error:', signedUrlError)
-                  // Fallback to public URL
-                  const { data: { publicUrl } } = supabase.storage
-                    .from('generated-audio')
-                    .getPublicUrl(audioUpload.path)
-                  audioUrl = publicUrl
-                } else {
-                  audioUrl = signedUrlData.signedUrl
-                }
+                // Use public URL since service role has full access
+                const { data: { publicUrl } } = serviceSupabase.storage
+                  .from('uploads')
+                  .getPublicUrl(audioUpload.path)
+                audioUrl = publicUrl
+                console.log('Audio uploaded successfully:', audioUrl)
               }
             } catch (audioError) {
               console.error('Audio generation error:', audioError)
