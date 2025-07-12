@@ -6,10 +6,15 @@ import { createServerActionClient } from './supabase-server';
 export async function signInWithGoogle() {
 	const supabase = await createServerActionClient();
 
+	// Get the current origin from headers or fallback to env variable
+	const origin = process.env.VERCEL_URL 
+		? `https://${process.env.VERCEL_URL}` 
+		: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3003';
+
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider: 'google',
 		options: {
-			redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback`,
+			redirectTo: `${origin}/api/auth/callback`,
 		},
 	});
 
@@ -25,10 +30,15 @@ export async function signInWithGoogle() {
 export async function sendMagicLink(email: string) {
 	const supabase = await createServerActionClient();
 
+	// Get the current origin from headers or fallback to env variable
+	const origin = process.env.VERCEL_URL 
+		? `https://${process.env.VERCEL_URL}` 
+		: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3003';
+
 	const { error } = await supabase.auth.signInWithOtp({
 		email,
 		options: {
-			emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback`,
+			emailRedirectTo: `${origin}/api/auth/callback`,
 		},
 	});
 
