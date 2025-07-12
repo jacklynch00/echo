@@ -23,6 +23,12 @@ export async function POST(request: NextRequest) {
 
     // Clone the voice using ElevenLabs
     const voiceId = await cloneVoice(audioFile, name)
+    
+    if (!voiceId) {
+      return NextResponse.json({ 
+        error: 'Failed to clone voice - no voice ID returned' 
+      }, { status: 500 })
+    }
 
     // Save person to database
     const supabase = await createServerActionClient()

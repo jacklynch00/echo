@@ -1,4 +1,5 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js'
+import { Readable } from 'stream'
 
 const client = new ElevenLabsClient({
   apiKey: process.env.ELEVENLABS_API_KEY!,
@@ -6,19 +7,39 @@ const client = new ElevenLabsClient({
 
 export async function cloneVoice(file: File, name: string) {
   try {
-    // Convert File to Blob and then to stream for ElevenLabs API
-    const blob = new Blob([file])
-    const stream = blob.stream()
+    console.log('Starting voice cloning for:', name, 'File size:', file.size, 'File type:', file.type)
+    
+    // Convert File to Buffer and then to Node.js readable stream
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    
+    // Create a Node.js readable stream from the buffer
+    const stream = new Readable({
+      read() {
+        this.push(buffer)
+        this.push(null) // End the stream
+      }
+    })
     
     const voice = await client.voices.ivc.create({
       name: name,
-      files: [stream as any]
+      files: [stream]
     })
     
-    return voice.voice_id
+    console.log('Voice cloning response:', JSON.stringify(voice, null, 2))
+    
+    // Check different possible property names for the voice ID
+    const voiceId = voice.voice_id || voice.id || voice.voiceId
+    
+    if (!voiceId) {
+      console.error('No voice ID found in response. Available properties:', Object.keys(voice))
+      throw new Error('No voice ID returned from ElevenLabs API')
+    }
+    
+    return voiceId
   } catch (error) {
     console.error('Voice cloning error:', error)
-    throw new Error('Failed to clone voice')
+    throw new Error(`Failed to clone voice: ${error.message}`)
   }
 }
 
